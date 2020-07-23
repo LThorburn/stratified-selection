@@ -11,7 +11,7 @@
 		<link rel="stylesheet" type="text/css" href="css/main.css"/>
 
 		<!-- JavaScript -->
-		<script type="text/javascript" src="js/papaparse.min.js"></script>
+		<script type="text/javascript" src="js/xlsx.core.min.js"></script>
 
 	</head>
 
@@ -25,19 +25,25 @@
 			
 			<h2><strong>1</strong> - Import data</h2>
 
-			<div id="import-variables" class="filedrop" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+			<div id="dragdrop-variables" class="filedrop" ondrop="dropHandler(event, 'variables');" ondragover="dragOverHandler(event, 'variables');" ondragleave="dragLeaveHandler(event, 'variables');">
 				Drag and drop a CSV or Excel file with your population variables here.
+				<input id="browse-variables" type="file" class="filebrowse" />
 			</div>
 
-			<div id="import-candidates" class="filedrop" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+			<div id="dragdrop-candidates" class="filedrop" ondrop="dropHandler(event, 'candidates');" ondragover="dragOverHandler(event, 'candidates');" ondragleave="dragLeaveHandler(event, 'candidates');">
 				Drag and drop a CSV or Excel file with your candidate information here.
+				<input id="browse-candidates" type="file" class="filebrowse" />
 			</div>
 
 			<h2><strong>2</strong> - Choose settings</h2>
 
 			<h2><strong>3</strong> - Run selection</h2>
+			
+			<div id="run" class="button">RUN</div>
 
 			<h2><strong>4</strong> - Export</h2>
+
+			<div id="export-csv" class="button">EXPORT as .CSV</div> <div id="export-xlsx" class="button">EXPORT as .XLSX</div>
 
 		</main>
 
