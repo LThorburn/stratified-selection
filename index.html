@@ -1,57 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	<head>
-		<meta charset="utf-8">
+<head>
+	<meta charset="utf-8">
 
-		<title>Stratified Random Selection</title>
+	<title>Stratified Random Selection Tool</title>
 
-		<!-- CSS -->
-		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
-		<link rel="stylesheet" type="text/css" href="css/main.css"/>
+	<!-- CSS -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="css/main.css"/>
 
-		<!-- JavaScript -->
-		<script type="text/javascript" src="js/xlsx.core.min.js"></script>
+	<!-- JavaScript -->
+	<script type="text/javascript" src="js/xlsx.core.min.js"></script>
+	<script type="text/javascript" src="js/math.min.js"></script>
+	<script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
 
-	</head>
+</head>
 
-	<body>
+<body>
 
-		<header>
-			<h1>Stratified Random Selection</h1>
-		</header>
+	<header>
+		<div class="title">Stratified Random Selection Tool</div>
+		<div class="logo"><a href="https://www.newdemocracy.com.au/"><img src="/img/logo.png" /></a></div>
+	</header>
 
-		<main>
-			
+	<main>
+		
+		<nav>
+			<div class="tab active" data-pane="about">About</div>
+			<div class="tab" data-pane="import">Import data</div>
+			<div class="tab" data-pane="settings">Choose settings</div>
+			<div class="tab" data-pane="run">Run selection</div>
+			<div class="tab" data-pane="export">Export</div>
+		</nav>
+
+		<div class="pane" data-pane="about">
+			This section will contain introductory information.
+
+			<div style="font-size: 12px;margin-top:1.5rem;">
+				<strong>TO DO</strong>
+				<ul>
+					<li>Cite original simplex solver algorithm write-up, XLSX, mathjs.</li>
+					<li>Cite original stratified selection code.</li>
+			</div>
+		</div>
+
+		<div class="pane hide" data-pane="import">
+
 			<h2><strong>1</strong> - Import data</h2>
 
-			<div id="dragdrop-variables" class="filedrop" ondrop="dropHandler(event, 'variables');" ondragover="dragOverHandler(event, 'variables');" ondragleave="dragLeaveHandler(event, 'variables');">
+			<div id="dragdrop-variables" class="filedrop">
 				Drag and drop a CSV or Excel file with your population variables here.
 				<input id="browse-variables" type="file" class="filebrowse" />
 			</div>
 
-			<div id="dragdrop-candidates" class="filedrop" ondrop="dropHandler(event, 'candidates');" ondragover="dragOverHandler(event, 'candidates');" ondragleave="dragLeaveHandler(event, 'candidates');">
+			<div id="dragdrop-people" class="filedrop">
 				Drag and drop a CSV or Excel file with your candidate information here.
-				<input id="browse-candidates" type="file" class="filebrowse" />
+				<input id="browse-people" type="file" class="filebrowse" />
 			</div>
 
+		</div>
+
+		<div class="pane hide" data-pane="settings">
+
 			<h2><strong>2</strong> - Choose settings</h2>
+
+			Selection algorithm: <select name="algorithm" id="algorithm-select">
+			</select>
+
+			<br /><br />
+
+			Check same address? <input type="checkbox" name="check-same-address" id="checkSameAddress" checked /> <br />
+
+			<p>If check_same_address is true, then no 2 people from the same address will be selected. The comparison is between TWO fields listed here, which MUST also be below in columns_to_keep</p>
+
+			Fair to households? <input type="checkbox" name="fair-to-housholds" id="fairToHouseholds" checked /> <br />
+
+			<p>If false, maximin and nash algorithms aim to balance each person's probability. If true, they instead aim to give each household the same expected number of members on the committee. If households are contacted by mail without consideration for their size, `fair_to_households = false` can counterbalance the bias against larger households.</p>
+
+			Number of people to select: <input type="number" name="n-to-select" id="n-to-select" value="11"/>
+
+		</div>
+
+		<div class="pane hide" data-pane="run">
 
 			<h2><strong>3</strong> - Run selection</h2>
 			
 			<div id="run" class="button">RUN</div>
 
+		</div>
+
+		<div class="pane hide" data-pane="export">
+
 			<h2><strong>4</strong> - Export</h2>
 
 			<div id="export-csv" class="button">EXPORT as .CSV</div> <div id="export-xlsx" class="button">EXPORT as .XLSX</div>
 
-		</main>
+		</div>
 
-		<script type="text/javascript" src="js/stratification.js"></script>
+	</main>
 
-		<footer>
-		</footer>
+	<footer>
+		<div>
+			<a href="https://www.newdemocracy.com.au/">newDemocracy Foundation</a>
+			<br />
+			Made available under an MIT License (?).
+		</div>
+		<div class="right">
+			Built and maintained by <a href="https://lukethorburn.com/">Luke Thorburn</a>
+		</div>
+	</footer>
+	
+	<script type="module" src="js/stratification.js"></script>
 
-	</body>
+	<script>
+		function clickTab(event) {
+			changeTab(event.srcElement.getAttribute('data-pane'));
+		}
+
+		function changeTab(id) {
+			
+			// Set all tabs to inactive.
+			let tabs = document.querySelectorAll('nav div.tab');
+			for (let j = 0; j < tabs.length; j++) {
+				tabs[j].classList.remove('active');
+			}
+
+			// Set clicked tab to active.
+			document.querySelector(`.tab[data-pane="${id}"]`)
+					.classList.add('active');
+
+			// Hide all panes.
+			let panes = document.querySelectorAll('div.pane');
+			for (let j = 0; j < panes.length; j++) {
+				panes[j].classList.add('hide');
+			}
+
+			// Show clicked pane.
+			document
+				.querySelector(`.pane[data-pane="${id}"]`)
+				.classList.remove('hide');
+
+		}
+
+		let tabs = document.querySelectorAll('nav div.tab');
+		for (let i = 0; i < tabs.length; i ++) {
+			tabs[i].addEventListener('click', clickTab, false);
+		}	
+	</script>
+
+</body>
 
 </html>
