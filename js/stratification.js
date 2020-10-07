@@ -262,6 +262,14 @@ document.getElementById('dragdrop-people')
 document.getElementById('browse-variables').addEventListener('change', handleFileSelect, false);
 document.getElementById('browse-people').addEventListener('change', handleFileSelect, false);
 
+function loadExampleData() {
+	input = exampleInput;
+	console.log(input);
+}
+
+document.getElementById('loadExampleData')
+	.addEventListener('click', loadExampleData, false);
+
 // ------------------------------------------------------------------------------- //
 // RUN
 
@@ -270,24 +278,31 @@ document.getElementById('browse-people').addEventListener('change', handleFileSe
 let algorithms = [
 	{
 		id: 'maximin',
-		name: 'Maximin'
+		name: 'Maximin',
+		disabled: false
 	},
 	{
 		id: 'nash',
-		name: 'Nash'
+		name: 'Nash',
+		disabled: true
 	},
 ];
 
 let algorithmSelect = document.getElementById('algorithm-select');
 
 algorithms.forEach(function(d) {
-	algorithmSelect.innerHTML = algorithmSelect.innerHTML + `<option value="${d.id}">${d.name}</option>`;
+	algorithmSelect.innerHTML = algorithmSelect.innerHTML + `<option value="${d.id}" ${d.disabled ? 'disabled' : ''}>${d.name}</option>`;
 })
 
 // Display error messages.
 
 function log(message) {
 	console.log(message);
+	let logArea = document.getElementById('log');
+	const p = document.createElement('p');
+	p.innerHTML = message;
+	logArea.append(p);
+	logArea.scrollTop = logArea.scrollHeight;
 }
 
 function error(message) {
@@ -1089,7 +1104,11 @@ function runStratification() {
 		log(`Failed after ${nIters} iterations. Gave up.`);
 	}
 
-	output = input.people;
+
+	peopleSelected = peopleSelected.map(d => d.slice(6));
+	console.log(peopleSelected);
+	console.log(input.people);
+	output = deepCopy(input.people).filter(p => peopleSelected.includes(String(p.id)));
 
 }
 
